@@ -1,0 +1,29 @@
+{
+  "queries": [
+    {
+      "timestamp": "2026-01-03T22:10:24.199038",
+      "session_id": "ed7cf50a-eb69-4b04-ad28-85ea9de5f1e0",
+      "user_input": "Berapa jatah cuti tahunan?",
+      "category": "cuti",
+      "confidence": 96.4,
+      "is_fallback": false
+    }
+  ],
+  "feedback": [
+    {
+      "timestamp": "2026-01-03T22:12:13.683236",
+      "session_id": "ed7cf50a-eb69-4b04-ad28-85ea9de5f1e0",
+      "rating": 4,
+      "comment": null
+    }
+  ],
+  "sessions": {
+    "ed7cf50a-eb69-4b04-ad28-85ea9de5f1e0": {
+      "start_time": "2026-01-03T22:10:24.199124",
+      "query_count": 1,
+      "last_activity": "2026-01-03T22:10:24.199128",
+      "rated": true,
+      "rating": 4
+    }
+  }
+}
