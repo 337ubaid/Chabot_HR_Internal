@@ -17,9 +17,9 @@ import time
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from data.hr_knowledge_base import get_flat_qa_pairs, get_categories, HR_KNOWLEDGE_BASE
-from core.fuzzy_matcher import HRChatbotEngine
-from core.analytics import get_analytics
+from hr_knowledge_base import get_flat_qa_pairs, get_categories, HR_KNOWLEDGE_BASE
+from fuzzy_matcher import HRChatbotEngine
+from analytics import get_analytics
 
 # Page configuration
 st.set_page_config(
@@ -102,6 +102,9 @@ def init_session_state():
         st.session_state.rating_submitted = False
     if 'show_rating_prompt' not in st.session_state:
         st.session_state.show_rating_prompt = False
+    # ✅ TAMBAHAN: Input counter untuk reset input
+    if 'input_counter' not in st.session_state:
+        st.session_state.input_counter = 0
 
 init_session_state()
 
@@ -122,9 +125,7 @@ def check_inactivity():
 
 # ==================== CHAT PAGE ====================
 def render_chat_page():
-    st.title("💬 HR Assistant Chatbot")
-    st.markdown("---")
-    
+    st.title("💬 HR Assistant Chatbot")    
     # Check inactivity
     check_inactivity()
     
@@ -167,6 +168,7 @@ def render_chat_page():
                             if st.button(f"❓ {sug['question']}", key=f"sug_{i}_{sug['question'][:20]}"):
                                 # Process suggested question
                                 process_user_input(sug['question'])
+                                st.session_state.input_counter += 1  # ✅ Increment counter
                                 st.rerun()
     
     # Rating prompt after inactivity
@@ -207,18 +209,21 @@ def render_chat_page():
     col1, col2 = st.columns([5, 1])
     
     with col1:
+        # ✅ PERBAIKAN: Key dinamis untuk reset input
         user_input = st.text_input(
             "Ketik pertanyaan Anda:",
-            key="user_input",
+            key=f"user_input_{st.session_state.input_counter}",
             placeholder="Contoh: Berapa jatah cuti tahunan saya?",
             disabled=st.session_state.session_ended
         )
-    
-    with col2:
         send_clicked = st.button("Kirim 📤", disabled=st.session_state.session_ended)
     
-    if (send_clicked or user_input) and user_input.strip():
+    # with col2:
+    
+    # ✅ PERBAIKAN: Proses input hanya jika ada perubahan
+    if send_clicked and user_input and user_input.strip():
         process_user_input(user_input.strip())
+        st.session_state.input_counter += 1  # ✅ Increment untuk reset input
         st.rerun()
     
     # End chat button
@@ -239,6 +244,7 @@ def render_chat_page():
                 st.session_state.session_ended = False
                 st.session_state.rating_submitted = False
                 st.session_state.show_rating_prompt = False
+                st.session_state.input_counter += 1  # ✅ Reset input
                 st.rerun()
     
     # Quick action buttons
@@ -257,10 +263,18 @@ def render_chat_page():
         with cols[i]:
             if st.button(q, key=f"quick_{i}", disabled=st.session_state.session_ended):
                 process_user_input(q)
+                st.session_state.input_counter += 1  # ✅ Increment counter
                 st.rerun()
 
 def process_user_input(user_input: str):
     """Process user input and generate response."""
+    
+    # ✅ PERBAIKAN: Cek duplikasi pesan
+    if st.session_state.messages:
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "user" and last_message["content"] == user_input:
+            return  # Skip jika pesan sama dengan terakhir
+    
     # Add user message
     st.session_state.messages.append({
         "role": "user",

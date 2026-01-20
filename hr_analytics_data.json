@@ -7,6 +7,38 @@
       "category": "cuti",
       "confidence": 96.4,
       "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T13:50:21.746746",
+      "session_id": "b32d4c69-811a-4159-8c72-79084e6c3cea",
+      "user_input": "apa saja yang bisa kamu bantu?",
+      "category": "greeting",
+      "confidence": 74.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:01:41.500461",
+      "session_id": "cb85eabc-1fac-4d1b-82b9-85f8c7f770bd",
+      "user_input": "Berapa jatah cuti tahunan?",
+      "category": "cuti",
+      "confidence": 96.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:01:57.848758",
+      "session_id": "cb85eabc-1fac-4d1b-82b9-85f8c7f770bd",
+      "user_input": "apa yg bisa kamu bantu",
+      "category": "greeting",
+      "confidence": 76.65,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:02:29.544467",
+      "session_id": "cb85eabc-1fac-4d1b-82b9-85f8c7f770bd",
+      "user_input": "apa aja benefitnya",
+      "category": null,
+      "confidence": 57.949999999999996,
+      "is_fallback": true
     }
   ],
   "feedback": [
@@ -14,6 +46,12 @@
       "timestamp": "2026-01-03T22:12:13.683236",
       "session_id": "ed7cf50a-eb69-4b04-ad28-85ea9de5f1e0",
       "rating": 4,
+      "comment": null
+    },
+    {
+      "timestamp": "2026-01-20T13:50:37.896559",
+      "session_id": "b32d4c69-811a-4159-8c72-79084e6c3cea",
+      "rating": 5,
       "comment": null
     }
   ],
@@ -24,6 +62,43 @@
       "last_activity": "2026-01-03T22:10:24.199128",
       "rated": true,
       "rating": 4
+    },
+    "1f399e09-7efc-4fe3-a79c-46af215c25da": {
+      "start_time": "2026-01-15T09:39:38.155163",
+      "query_count": 87,
+      "last_activity": "2026-01-15T09:40:08.146603",
+      "rated": false
+    },
+    "d31e7e97-bf2d-4863-b0c4-022b22968eba": {
+      "start_time": "2026-01-15T09:41:16.460677",
+      "query_count": 55,
+      "last_activity": "2026-01-15T09:41:34.642064",
+      "rated": false
+    },
+    "f383d7db-6660-41dd-95e2-357e550183c7": {
+      "start_time": "2026-01-15T09:41:44.250702",
+      "query_count": 40,
+      "last_activity": "2026-01-15T09:41:58.179687",
+      "rated": false
+    },
+    "f9e70024-eb9f-4904-9773-1b0a5fb5c274": {
+      "start_time": "2026-01-15T10:38:39.505692",
+      "query_count": 2,
+      "last_activity": "2026-01-15T10:38:43.961967",
+      "rated": false
+    },
+    "b32d4c69-811a-4159-8c72-79084e6c3cea": {
+      "start_time": "2026-01-20T13:50:09.339775",
+      "query_count": 2,
+      "last_activity": "2026-01-20T13:50:21.746761",
+      "rated": true,
+      "rating": 5
+    },
+    "cb85eabc-1fac-4d1b-82b9-85f8c7f770bd": {
+      "start_time": "2026-01-20T14:01:41.500484",
+      "query_count": 3,
+      "last_activity": "2026-01-20T14:02:29.544483",
+      "rated": false
     }
   }
 }
