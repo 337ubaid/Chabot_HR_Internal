@@ -1,173 +1,170 @@
-# 🏢 HR Internal Chatbot
+# HR Internal Chatbot 🤖
 
-Chatbot HR internal berbasis FuzzyWuzzy untuk menjawab pertanyaan karyawan seputar kebijakan perusahaan, dengan fitur analytics dashboard dan rating system.
+Chatbot internal untuk menjawab pertanyaan karyawan seputar kebijakan HR dengan sistem fuzzy matching dan analytics dashboard.
 
-## ✨ Fitur
+## 📋 Fitur
 
-### 1. Chat Interface
-- **Natural Language Processing** - Menggunakan FuzzyWuzzy dengan multiple matching strategies
-- **High Accuracy** - Kombinasi Token Set, Token Sort, Partial, dan Simple Ratio
-- **Smart Suggestions** - Memberikan saran pertanyaan jika tidak ditemukan match
+### 1. Interactive Chat
+- ✅ Fuzzy matching dengan FuzzyWuzzy (toleran terhadap typo)
+- ✅ Confidence score untuk setiap jawaban
+- ✅ Suggestions jika pertanyaan tidak cocok
+- ✅ Support 200+ variasi pertanyaan
 
 ### 2. Session Management
-- **Timeout Detection** - Mendeteksi inaktivitas setelah 3 menit
-- **Auto Rating Prompt** - Meminta feedback setelah sesi selesai
-- **Conversation History** - Menyimpan riwayat percakapan per sesi
+- ✅ Tracking aktivitas user
+- ✅ Auto-prompt rating setelah 3 menit inaktif
+- ✅ Session ID unik untuk analytics
 
-### 3. Analytics Dashboard
-- **Top 10 Queries** - Pertanyaan paling sering ditanyakan
-- **Category Distribution** - Distribusi pertanyaan per kategori
-- **Daily Trends** - Tren pertanyaan harian/mingguan
-- **Hourly Distribution** - Jam-jam aktif penggunaan
-- **Feedback Stats** - Statistik rating dan komentar
-- **Accuracy Metrics** - Confidence score rata-rata
+### 3. Rating System
+- ✅ Rating 1-5 bintang
+- ✅ Komentar opsional
+- ✅ Tracking kepuasan pengguna
 
-### 4. Rating System
-- Rating 1-5 bintang
-- Komentar opsional
-- Tracking untuk improvement
+### 4. Analytics Dashboard
+- ✅ Top 10 pertanyaan
+- ✅ Distribusi kategori
+- ✅ Tren harian
+- ✅ Distribusi jam aktif
+- ✅ Statistik feedback
+- ✅ Fallback rate
 
-## 📁 Struktur Project
+### 5. FAQ Browser
+- ✅ Browse semua FAQ
+- ✅ Filter by kategori
+- ✅ Search functionality
+
+## 🗂️ Struktur File
 
 ```
-hr_chatbot/
-├── app.py                    # Main Streamlit application
-├── requirements.txt          # Python dependencies
-├── README.md                 # Documentation
-├── data/
-│   ├── __init__.py
-│   └── hr_knowledge_base.py  # Knowledge base dengan variasi pertanyaan
-├── core/
-│   ├── __init__.py
-│   ├── fuzzy_matcher.py      # FuzzyWuzzy matcher engine
-│   └── analytics.py          # Analytics tracking module
-└── hr_analytics_data.json    # Analytics data storage (auto-generated)
+hr-chatbot/
+│
+├── config.py                 # Konfigurasi (threshold, timeout, dll)
+├── hr_knowledge_base.py      # Database pertanyaan & jawaban
+├── fuzzy_matcher.py          # Engine matching FuzzyWuzzy
+├── analytics.py              # Module analytics & logging
+├── app.py                    # Aplikasi Streamlit utama
+├── requirements.txt          # Dependencies Python
+├── hr_analytics_data.json    # Data analytics (auto-generated)
+└── README.md                 # Dokumentasi
 ```
 
-## 🚀 Cara Menjalankan
+## 🚀 Cara Install & Run
 
-### Prerequisites
-- Python 3.8+
-- pip
-
-### Installation
-
+### 1. Clone Repository
 ```bash
-# Clone atau copy folder project
-cd hr_chatbot
+git clone <repo-url>
+cd hr-chatbot
+```
 
-# Install dependencies
+### 2. Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
-# Jalankan aplikasi
+### 3. Run Aplikasi
+```bash
 streamlit run app.py
 ```
 
-### Akses Aplikasi
-Buka browser dan akses: `http://localhost:8501`
+Aplikasi akan buka di browser: `http://localhost:8501`
 
-## 📂 Kategori Pertanyaan
+## ⚙️ Konfigurasi
 
-| Kategori | Topik |
-|----------|-------|
-| 🏖️ Cuti | Cuti tahunan, cuti melahirkan, cuti menikah |
-| 💰 Gaji | Tanggal gajian, slip gaji, potongan |
-| 🎁 Benefit | Asuransi, THR, bonus, pinjaman |
-| ⏰ Lembur | Cara lapor lembur |
-| 📋 Administrasi | BPJS, password portal, kartu akses |
-| 📈 Karir | Promosi, resign, KPI, training |
-| 🏢 Fasilitas | Shuttle, ruang laktasi, laptop |
-| 📜 Kebijakan | Jam kerja, WFH, dress code |
-| 💳 Reimbursement | Klaim parkir, klaim medis |
-| 📞 Kontak | HR Hotline |
+Edit `config.py` untuk mengubah:
 
-## 🔧 Konfigurasi
-
-### Threshold Matching
-Edit di `app.py`:
 ```python
-st.session_state.chatbot_engine = HRChatbotEngine(qa_pairs, threshold=65)
-```
-- Nilai lebih tinggi = lebih strict
-- Nilai lebih rendah = lebih flexible
+# Threshold matching (0-100)
+FUZZY_THRESHOLD = 65
 
-### Timeout Inaktivitas
-Edit di `app.py` fungsi `check_inactivity()`:
-```python
-if time_since_last > timedelta(minutes=3):  # Ubah menit sesuai kebutuhan
+# Timeout inactivity (menit)
+INACTIVITY_TIMEOUT_MINUTES = 3
+
+# Maximum chat history
+MAX_CHAT_HISTORY = 100
+
+# Batch saving
+SAVE_BATCH_SIZE = 10
+SAVE_INTERVAL_SECONDS = 60
+
+# dsb..
 ```
 
-### Menambah Pertanyaan Baru
-Edit `data/hr_knowledge_base.py`:
+## 📂 Kategori FAQ
+
+Chatbot memahami pertanyaan dalam kategori:
+- 🏖️ **Cuti** - Cuti tahunan, melahirkan, menikah
+- 💰 **Gaji** - Jadwal gaji, slip gaji, potongan
+- 🎁 **Benefit** - THR, bonus, asuransi, tunjangan
+- ⏰ **Lembur** - Klaim lembur, approval
+- 📋 **Administrasi** - BPJS, kartu akses, password
+- 📈 **Karir** - Promosi, resign, KPI, training
+- 🏢 **Fasilitas** - Shuttle bus, ruang laktasi, laptop
+- 📜 **Kebijakan** - Jam kerja, WFH, dress code
+- 💳 **Reimbursement** - Klaim parkir, medis
+- 📞 **Kontak** - Hotline HR
+- 👋 **Greeting** - Sapaan dasar
+
+## 📝 Cara Menambah FAQ Baru
+
+Edit `hr_knowledge_base.py`:
+
 ```python
 {
-    "kategori": "nama_kategori",
-    "pertanyaan_utama": "Pertanyaan utama?",
+    "kategori": "cuti",
+    "pertanyaan_utama": "Pertanyaan baru?",
     "variasi": [
         "variasi 1",
         "variasi 2",
-        # dst...
+        "variasi 3",
     ],
-    "jawaban": "Jawaban lengkap untuk pertanyaan ini."
+    "jawaban": "Jawaban lengkap di sini."
 }
 ```
 
+Restart aplikasi untuk apply changes.
+
 ## 📊 Analytics Data
 
-Data analytics disimpan di `hr_analytics_data.json` dengan format:
-- **queries**: Log semua pertanyaan (max 10,000 terakhir)
-- **feedback**: Log semua rating/komentar (max 5,000 terakhir)
-- **sessions**: Data sesi pengguna (max 1,000 terakhir)
+Data disimpan di `hr_analytics_data.json`:
 
-## 🎯 Algoritma Matching
-
-FuzzyWuzzy menggunakan kombinasi weighted scoring:
-
-| Method | Weight | Kegunaan |
-|--------|--------|----------|
-| Token Set Ratio | 35% | Kata berbeda urutan |
-| Partial Ratio | 25% | Substring matching |
-| Token Sort Ratio | 25% | Kata sama, urutan beda |
-| Simple Ratio | 15% | Mirip persis |
-
-## 📝 Contoh Penggunaan
-
-### Pertanyaan Normal
-```
-User: "gimana cara ngajuin cuti ya?"
-Bot:  "Pengajuan cuti dilakukan melalui portal HRIS maksimal 3 hari sebelum tanggal pengambilan cuti."
-      Confidence: 87% | Category: CUTI
+```json
+{
+  "queries": [...],      // Log semua pertanyaan
+  "feedback": [...],     // Log rating & komentar
+  "sessions": {...}      // Info session user
+}
 ```
 
-### Pertanyaan Tidak Dikenali
-```
-User: "xyz123"
-Bot:  "Maaf, saya belum bisa memahami pertanyaan Anda..."
-      [Suggestions: pertanyaan yang mungkin dimaksud]
-```
+**Note**: File ini auto-generated, tidak perlu edit manual.
 
-## 🛠️ Troubleshooting
+## 🌐 Deploy ke Streamlit Cloud
 
-### Streamlit Error
-```bash
-pip install --upgrade streamlit
-```
+### Option 1: File JSON (Temporary)
+1. Push ke GitHub
+2. Connect di [streamlit.io](https://streamlit.io)
+3. Deploy!
 
-### FuzzyWuzzy Warning
-```bash
-pip install python-Levenshtein
-```
+⚠️ **Caveat**: Data analytics akan hilang setiap redeploy.
 
-### Port Already in Use
-```bash
-streamlit run app.py --server.port 8502
-```
+### Option 2: Supabase (Production)
+Untuk persistent storage, ikuti guide di [DEPLOYMENT.md](DEPLOYMENT.md)
 
-## 📧 Support
+## 🤝 Kontribusi
 
-Untuk pertanyaan teknis atau request fitur baru, hubungi tim IT Development.
+Untuk menambah fitur atau fix bugs:
+
+1. Fork repository
+2. Create feature branch
+3. Commit changes
+4. Push & create PR
+
+## 📄 License
+
+Internal use only
+
 
 ---
-**Version**: 1.0  
-**Last Updated**: 2024  
-**Internal Use Only**
+
+**Version**: 1.3
+**Last Updated**: January 2026  
+**Maintained by**: IT Team

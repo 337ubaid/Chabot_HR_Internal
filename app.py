@@ -1,10 +1,14 @@
 """
 HR Internal Chatbot - Streamlit Application
-Features:
-1. Interactive chat interface dengan FuzzyWuzzy matching
+============================================
+Aplikasi chatbot HR dengan interface web menggunakan Streamlit.
+
+Fitur utama:
+1. Interactive chat interface dengan fuzzy matching
 2. Session management dengan timeout detection
 3. Rating system untuk feedback
-4. HR Analytics Dashboard
+4. Analytics dashboard
+5. FAQ browser
 """
 
 import streamlit as st
@@ -12,26 +16,33 @@ import sys
 import os
 import uuid
 from datetime import datetime, timedelta
-import time
 
-# Add parent directory to path for imports
+# Add parent directory untuk imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from hr_knowledge_base import get_flat_qa_pairs, get_categories, HR_KNOWLEDGE_BASE
 from fuzzy_matcher import HRChatbotEngine
 from analytics import get_analytics
+from config import config
 
-# Page configuration
+# ============================================================================
+# PAGE CONFIGURATION
+# ============================================================================
+
 st.set_page_config(
-    page_title="HR Chatbot Internal",
-    page_icon="🏢",
+    page_title=config.PAGE_TITLE,
+    page_icon=config.PAGE_ICON,
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# ============================================================================
+# CUSTOM CSS
+# ============================================================================
+
 st.markdown("""
 <style>
+    /* Styling untuk chat messages */
     .chat-message {
         padding: 1rem;
         border-radius: 0.5rem;
@@ -47,6 +58,8 @@ st.markdown("""
         background-color: #f5f5f5;
         border-left: 4px solid #4CAF50;
     }
+    
+    /* Badge untuk confidence dan category */
     .confidence-badge {
         font-size: 0.75rem;
         padding: 0.2rem 0.5rem;
@@ -62,70 +75,160 @@ st.markdown("""
         color: #e65100;
         margin-left: 0.5rem;
     }
-    .stButton>button {
-        width: 100%;
-    }
+    
+    /* Rating section */
     .rating-section {
         background-color: #fff8e1;
         padding: 1rem;
         border-radius: 0.5rem;
         margin-top: 1rem;
     }
-    .metric-card {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    }
-    div[data-testid="stSidebarNav"] {
-        padding-top: 1rem;
+    
+    /* Buttons */
+    .stButton>button {
+        width: 100%;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+# ============================================================================
+# SESSION STATE INITIALIZATION
+# ============================================================================
+
 def init_session_state():
+    """
+    Initialize semua session state variables.
+    Dipanggil saat app pertama kali load.
+    """
+    # Session ID unik untuk tracking
     if 'session_id' not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
+    
+    # Chat history
     if 'messages' not in st.session_state:
         st.session_state.messages = []
+    
+    # Chatbot engine
     if 'chatbot_engine' not in st.session_state:
         qa_pairs = get_flat_qa_pairs()
-        st.session_state.chatbot_engine = HRChatbotEngine(qa_pairs, threshold=65)
+        st.session_state.chatbot_engine = HRChatbotEngine(qa_pairs, threshold=config.FUZZY_THRESHOLD)
+    
+    # Analytics engine
     if 'analytics' not in st.session_state:
-        st.session_state.analytics = get_analytics("hr_analytics_data.json")
+        st.session_state.analytics = get_analytics(config.ANALYTICS_FILE)
+    
+    # Session tracking
     if 'last_activity' not in st.session_state:
         st.session_state.last_activity = datetime.now()
+    
+    # Session status
     if 'session_ended' not in st.session_state:
         st.session_state.session_ended = False
+    
+    # Rating status
     if 'rating_submitted' not in st.session_state:
         st.session_state.rating_submitted = False
+    
+    # Rating prompt visibility
     if 'show_rating_prompt' not in st.session_state:
         st.session_state.show_rating_prompt = False
-    # ✅ TAMBAHAN: Input counter untuk reset input
+    
+    # Input counter untuk reset textbox
     if 'input_counter' not in st.session_state:
         st.session_state.input_counter = 0
 
+
+# Initialize session state
 init_session_state()
 
-# Sidebar Navigation
-st.sidebar.title("🏢 HR Chatbot")
+# ============================================================================
+# SIDEBAR NAVIGATION
+# ============================================================================
+
+st.sidebar.title(f"{config.PAGE_ICON} HR Chatbot")
 page = st.sidebar.radio(
     "Menu",
     ["💬 Chat", "📊 Dashboard Analytics", "📚 FAQ Lengkap", "ℹ️ Tentang"],
     index=0
 )
 
-# Check for inactivity (3 minutes)
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
 def check_inactivity():
+    """
+    Check apakah user sudah tidak aktif selama N menit.
+    Jika ya, tampilkan rating prompt.
+    """
     if st.session_state.messages and not st.session_state.session_ended:
         time_since_last = datetime.now() - st.session_state.last_activity
-        if time_since_last > timedelta(minutes=3):
+        if time_since_last > timedelta(minutes=config.INACTIVITY_TIMEOUT_MINUTES):
             st.session_state.show_rating_prompt = True
 
-# ==================== CHAT PAGE ====================
+
+def process_user_input(user_input: str):
+    """
+    Process input dari user dan generate response.
+    
+    Args:
+        user_input: Pertanyaan dari user
+    """
+    # Validasi input
+    if not user_input or not user_input.strip():
+        return
+    
+    # Sanitize input
+    user_input = user_input.strip()[:config.MAX_USER_INPUT_LENGTH]
+    
+    # Check duplicate message (mencegah double submit)
+    if st.session_state.messages:
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "user" and last_message["content"] == user_input:
+            return  # Skip jika duplikat
+    
+    # Add user message ke history
+    st.session_state.messages.append({
+        "role": "user",
+        "content": user_input
+    })
+    
+    # Get response dari chatbot
+    response = st.session_state.chatbot_engine.get_response(user_input)
+    
+    # Log ke analytics
+    st.session_state.analytics.log_query(
+        st.session_state.session_id,
+        user_input,
+        response
+    )
+    
+    # Add bot response ke history
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": response['answer'],
+        "confidence": response['confidence'],
+        "category": response['category'],
+        "suggestions": response.get('suggestions', [])
+    })
+    
+    # Limit chat history untuk mencegah memory leak
+    if len(st.session_state.messages) > config.MAX_CHAT_HISTORY:
+        st.session_state.messages = st.session_state.messages[-config.MAX_CHAT_HISTORY:]
+    
+    # Update last activity
+    st.session_state.last_activity = datetime.now()
+    st.session_state.show_rating_prompt = False
+
+
+# ============================================================================
+# PAGE: CHAT
+# ============================================================================
+
 def render_chat_page():
-    st.title("💬 HR Assistant Chatbot")    
+    """Render halaman chat utama."""
+    st.title("💬 HR Assistant Chatbot")
+    
     # Check inactivity
     check_inactivity()
     
@@ -135,6 +238,7 @@ def render_chat_page():
     with chat_container:
         for i, message in enumerate(st.session_state.messages):
             if message["role"] == "user":
+                # User message
                 st.markdown(f"""
                 <div class="chat-message user">
                     <strong>👤 Anda:</strong>
@@ -142,14 +246,22 @@ def render_chat_page():
                 </div>
                 """, unsafe_allow_html=True)
             else:
+                # Bot message
                 confidence = message.get("confidence", 0)
                 category = message.get("category", "")
                 
-                confidence_color = "#4CAF50" if confidence >= 75 else "#FF9800" if confidence >= 50 else "#f44336"
+                # Determine confidence color
+                if confidence >= 75:
+                    conf_color = "#4CAF50"  # Green
+                elif confidence >= 50:
+                    conf_color = "#FF9800"  # Orange
+                else:
+                    conf_color = "#f44336"  # Red
                 
+                # Build badges HTML
                 badge_html = ""
                 if confidence > 0:
-                    badge_html += f'<span class="confidence-badge" style="background-color: {confidence_color}20; color: {confidence_color};">Confidence: {confidence:.0f}%</span>'
+                    badge_html += f'<span class="confidence-badge" style="background-color: {conf_color}20; color: {conf_color};">Confidence: {confidence:.0f}%</span>'
                 if category:
                     badge_html += f'<span class="category-badge">{category.upper()}</span>'
                 
@@ -161,17 +273,20 @@ def render_chat_page():
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Show suggestions if available
+                # Show suggestions jika ada
                 if message.get("suggestions"):
                     with st.expander("💡 Mungkin yang Anda maksud:"):
                         for sug in message["suggestions"]:
-                            if st.button(f"❓ {sug['question']}", key=f"sug_{i}_{sug['question'][:20]}"):
-                                # Process suggested question
+                            # Button unik per suggestion
+                            if st.button(
+                                f"✓ {sug['question']}", 
+                                key=f"sug_{i}_{hash(sug['question'])}"
+                            ):
                                 process_user_input(sug['question'])
-                                st.session_state.input_counter += 1  # ✅ Increment counter
+                                st.session_state.input_counter += 1
                                 st.rerun()
     
-    # Rating prompt after inactivity
+    # Rating prompt setelah inactivity
     if st.session_state.show_rating_prompt and not st.session_state.rating_submitted:
         st.markdown("---")
         st.markdown("""
@@ -182,15 +297,28 @@ def render_chat_page():
         """, unsafe_allow_html=True)
         
         col1, col2 = st.columns([3, 1])
+        
         with col1:
-            rating = st.slider("Rating pengalaman Anda:", 1, 5, 4, key="inactivity_rating")
+            rating = st.slider(
+                "Rating pengalaman Anda:", 
+                config.MIN_RATING, 
+                config.MAX_RATING, 
+                4, 
+                key="inactivity_rating"
+            )
+        
         with col2:
             if st.button("🔄 Lanjut Chat", key="continue_chat"):
                 st.session_state.show_rating_prompt = False
                 st.session_state.last_activity = datetime.now()
                 st.rerun()
         
-        comment = st.text_area("Komentar (opsional):", key="inactivity_comment", height=80)
+        comment = st.text_area(
+            "Komentar (opsional):", 
+            key="inactivity_comment", 
+            height=80,
+            max_chars=config.MAX_COMMENT_LENGTH
+        )
         
         if st.button("✅ Kirim Rating & Selesai", key="submit_inactivity_rating"):
             st.session_state.analytics.log_feedback(
@@ -203,27 +331,30 @@ def render_chat_page():
             st.success("Terima kasih atas feedback Anda! 🙏")
             st.rerun()
     
-    # Chat input
+    # Chat input section
     st.markdown("---")
     
     col1, col2 = st.columns([5, 1])
     
     with col1:
-        # ✅ PERBAIKAN: Key dinamis untuk reset input
+        # Dynamic key untuk auto-reset input field
         user_input = st.text_input(
             "Ketik pertanyaan Anda:",
             key=f"user_input_{st.session_state.input_counter}",
             placeholder="Contoh: Berapa jatah cuti tahunan saya?",
             disabled=st.session_state.session_ended
         )
-        send_clicked = st.button("Kirim 📤", disabled=st.session_state.session_ended)
     
-    # with col2:
+    with col2:
+        send_clicked = st.button(
+            "Kirim 📤", 
+            disabled=st.session_state.session_ended
+        )
     
-    # ✅ PERBAIKAN: Proses input hanya jika ada perubahan
+    # Process input jika ada
     if send_clicked and user_input and user_input.strip():
         process_user_input(user_input.strip())
-        st.session_state.input_counter += 1  # ✅ Increment untuk reset input
+        st.session_state.input_counter += 1  # Increment untuk reset input
         st.rerun()
     
     # End chat button
@@ -244,75 +375,46 @@ def render_chat_page():
                 st.session_state.session_ended = False
                 st.session_state.rating_submitted = False
                 st.session_state.show_rating_prompt = False
-                st.session_state.input_counter += 1  # ✅ Reset input
+                st.session_state.input_counter += 1
                 st.rerun()
     
     # Quick action buttons
     st.markdown("---")
     st.markdown("**🚀 Pertanyaan Populer:**")
-    quick_questions = [
-        "Berapa jatah cuti tahunan?",
-        "Kapan gaji cair?",
-        "Cara ajukan cuti?",
-        "Aturan WFH?",
-        "THR kapan diberikan?",
-    ]
     
-    cols = st.columns(len(quick_questions))
-    for i, q in enumerate(quick_questions):
+    quick_qs = config.QUICK_QUESTIONS
+    cols = st.columns(len(quick_qs))
+    
+    for i, q in enumerate(quick_qs):
         with cols[i]:
-            if st.button(q, key=f"quick_{i}", disabled=st.session_state.session_ended):
+            if st.button(
+                q, 
+                key=f"quick_{i}", 
+                disabled=st.session_state.session_ended
+            ):
                 process_user_input(q)
-                st.session_state.input_counter += 1  # ✅ Increment counter
+                st.session_state.input_counter += 1
                 st.rerun()
 
-def process_user_input(user_input: str):
-    """Process user input and generate response."""
-    
-    # ✅ PERBAIKAN: Cek duplikasi pesan
-    if st.session_state.messages:
-        last_message = st.session_state.messages[-1]
-        if last_message["role"] == "user" and last_message["content"] == user_input:
-            return  # Skip jika pesan sama dengan terakhir
-    
-    # Add user message
-    st.session_state.messages.append({
-        "role": "user",
-        "content": user_input
-    })
-    
-    # Get response
-    response = st.session_state.chatbot_engine.get_response(user_input)
-    
-    # Log to analytics
-    st.session_state.analytics.log_query(
-        st.session_state.session_id,
-        user_input,
-        response
-    )
-    
-    # Add bot response
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": response['answer'],
-        "confidence": response['confidence'],
-        "category": response['category'],
-        "suggestions": response.get('suggestions', [])
-    })
-    
-    # Update last activity
-    st.session_state.last_activity = datetime.now()
-    st.session_state.show_rating_prompt = False
 
-# ==================== DASHBOARD PAGE ====================
+# ============================================================================
+# PAGE: DASHBOARD ANALYTICS
+# ============================================================================
+
 def render_dashboard_page():
+    """Render halaman analytics dashboard."""
     st.title("📊 HR Analytics Dashboard")
     st.markdown("---")
     
     analytics = st.session_state.analytics
     
     # Time range selector
-    days = st.selectbox("Periode:", [7, 14, 30], index=0, format_func=lambda x: f"{x} hari terakhir")
+    days = st.selectbox(
+        "Periode:", 
+        [7, 14, 30], 
+        index=0, 
+        format_func=lambda x: f"{x} hari terakhir"
+    )
     
     # Summary metrics
     summary = analytics.get_summary_stats(days)
@@ -330,7 +432,7 @@ def render_dashboard_page():
         st.metric(
             "Total Sesi",
             summary['total_sessions'],
-            help="Jumlah sesi unik"
+            help="Jumlah sesi percakapan unik"
         )
     
     with col3:
@@ -370,7 +472,10 @@ def render_dashboard_page():
         
         if categories:
             import pandas as pd
-            df_cat = pd.DataFrame(list(categories.items()), columns=['Kategori', 'Jumlah'])
+            df_cat = pd.DataFrame(
+                list(categories.items()), 
+                columns=['Kategori', 'Jumlah']
+            )
             df_cat = df_cat.sort_values('Jumlah', ascending=False)
             st.bar_chart(df_cat.set_index('Kategori'))
         else:
@@ -378,11 +483,11 @@ def render_dashboard_page():
     
     st.markdown("---")
     
-    # Top queries
+    # Top queries dan hourly distribution
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🔝 Top 10 Pertanyaan")
+        st.subheader("🔍 Top 10 Pertanyaan")
         top_queries = analytics.get_top_queries(10, days)
         
         if top_queries:
@@ -399,7 +504,10 @@ def render_dashboard_page():
             import pandas as pd
             # Create full 24-hour distribution
             full_hourly = {h: hourly.get(h, 0) for h in range(24)}
-            df_hourly = pd.DataFrame(list(full_hourly.items()), columns=['Jam', 'Jumlah'])
+            df_hourly = pd.DataFrame(
+                list(full_hourly.items()), 
+                columns=['Jam', 'Jumlah']
+            )
             df_hourly = df_hourly.sort_values('Jam')
             st.bar_chart(df_hourly.set_index('Jam'))
         else:
@@ -423,7 +531,8 @@ def render_dashboard_page():
             st.markdown("**Distribusi Rating:**")
             for rating in range(5, 0, -1):
                 count = rating_dist.get(rating, 0)
-                st.progress(count / max(rating_dist.values()) if rating_dist.values() else 0)
+                max_count = max(rating_dist.values()) if rating_dist.values() else 1
+                st.progress(count / max_count)
                 st.caption(f"{'⭐' * rating}: {count}")
     
     with col3:
@@ -442,15 +551,23 @@ def render_dashboard_page():
     conf_stats = analytics.get_confidence_stats(days)
     
     col1, col2, col3 = st.columns(3)
+    
     with col1:
         st.metric("Confidence Rata-rata", f"{conf_stats['average']:.1f}%")
+    
     with col2:
         st.metric("Confidence Minimum", f"{conf_stats['min']:.1f}%")
+    
     with col3:
         st.metric("Confidence Maximum", f"{conf_stats['max']:.1f}%")
 
-# ==================== FAQ PAGE ====================
+
+# ============================================================================
+# PAGE: FAQ LENGKAP
+# ============================================================================
+
 def render_faq_page():
+    """Render halaman FAQ browser."""
     st.title("📚 FAQ Lengkap HR")
     st.markdown("---")
     
@@ -474,28 +591,37 @@ def render_faq_page():
         
         # Filter by search term
         if search_term:
-            if search_term.lower() not in item['pertanyaan_utama'].lower() and \
-               search_term.lower() not in item['jawaban'].lower():
+            if (search_term.lower() not in item['pertanyaan_utama'].lower() and 
+                search_term.lower() not in item['jawaban'].lower()):
                 continue
         
-        with st.expander(f"❓ {item['pertanyaan_utama']}"):
+        with st.expander(f"{item['pertanyaan_utama']}"):
             st.markdown(f"**Jawaban:**\n\n{item['jawaban']}")
             st.markdown(f"**Kategori:** `{item['kategori'].upper()}`")
             
             # Show variations
             if item['variasi']:
                 st.markdown("**Variasi pertanyaan yang dipahami:**")
-                st.caption(", ".join(item['variasi'][:5]) + ("..." if len(item['variasi']) > 5 else ""))
+                variasi_text = ", ".join(item['variasi'][:5])
+                if len(item['variasi']) > 5:
+                    variasi_text += "..."
+                st.caption(variasi_text)
 
-# ==================== ABOUT PAGE ====================
+
+# ============================================================================
+# PAGE: TENTANG
+# ============================================================================
+
 def render_about_page():
+    """Render halaman about/info."""
     st.title("ℹ️ Tentang HR Chatbot")
     st.markdown("---")
     
     st.markdown("""
     ### 🤖 HR Internal Chatbot
     
-    Chatbot ini dirancang untuk membantu karyawan mendapatkan informasi seputar kebijakan HR dengan cepat dan mudah.
+    Chatbot ini dirancang untuk membantu karyawan mendapatkan informasi seputar 
+    kebijakan HR dengan cepat dan mudah.
     
     #### ✨ Fitur Utama:
     
@@ -525,6 +651,8 @@ def render_about_page():
     
     categories = get_categories()
     cols = st.columns(3)
+    
+    # Icon mapping untuk kategori
     category_icons = {
         'cuti': '🏖️',
         'gaji': '💰',
@@ -546,17 +674,22 @@ def render_about_page():
     
     st.markdown("---")
     
-    st.markdown("""
+    st.markdown(f"""
     #### 🔧 Teknologi yang Digunakan:
-    - **FuzzyWuzzy** - String matching
-    - **Streamlit** - Web interface
-    - **Python** - Backend logic
+    - **FuzzyWuzzy** - String matching algorithm
+    - **Streamlit** - Web interface framework
+    - **Python** - Backend programming language
     
     #### 📧 Kontak:
-    Untuk pertanyaan yang tidak terjawab, silakan hubungi HR Hotline di **0812-XXXX-XXXX**
+    Untuk pertanyaan yang tidak terjawab, silakan hubungi HR Hotline di **{config.HR_HOTLINE}**
     """)
 
-# ==================== MAIN ====================
+
+# ============================================================================
+# MAIN ROUTER
+# ============================================================================
+
+# Route ke halaman yang dipilih
 if page == "💬 Chat":
     render_chat_page()
 elif page == "📊 Dashboard Analytics":
@@ -566,11 +699,14 @@ elif page == "📚 FAQ Lengkap":
 elif page == "ℹ️ Tentang":
     render_about_page()
 
-# Footer
+# ============================================================================
+# FOOTER
+# ============================================================================
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style="text-align: center; color: #666; font-size: 0.8rem;">
     HR Chatbot v1.0<br>
-    © 2024 Internal Use Only
+    © 2026 Internal Use Only
 </div>
 """, unsafe_allow_html=True)

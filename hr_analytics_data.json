@@ -39,6 +39,94 @@
       "category": null,
       "confidence": 57.949999999999996,
       "is_fallback": true
+    },
+    {
+      "timestamp": "2026-01-20T14:16:48.849488",
+      "session_id": "69d2351a-50c0-4ab1-9d44-1cad6092006a",
+      "user_input": "Berapa jatah cuti tahunan?",
+      "category": "cuti",
+      "confidence": 96.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:16:51.716968",
+      "session_id": "69d2351a-50c0-4ab1-9d44-1cad6092006a",
+      "user_input": "Kapan gaji cair?",
+      "category": "gaji",
+      "confidence": 86.6,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:16:54.186747",
+      "session_id": "69d2351a-50c0-4ab1-9d44-1cad6092006a",
+      "user_input": "Cara ajukan cuti?",
+      "category": "cuti",
+      "confidence": 100.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:16:56.682542",
+      "session_id": "69d2351a-50c0-4ab1-9d44-1cad6092006a",
+      "user_input": "Aturan WFH?",
+      "category": "kebijakan",
+      "confidence": 100.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:16:59.585555",
+      "session_id": "69d2351a-50c0-4ab1-9d44-1cad6092006a",
+      "user_input": "THR kapan diberikan?",
+      "category": "benefit",
+      "confidence": 87.2,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:17:47.206455",
+      "session_id": "59d19d84-dfc8-4c5e-9365-439ffe777d62",
+      "user_input": "Kapan gaji cair?",
+      "category": "gaji",
+      "confidence": 86.6,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:24:08.173545",
+      "session_id": "59d19d84-dfc8-4c5e-9365-439ffe777d62",
+      "user_input": "Berapa jatah cuti tahunan?",
+      "category": "cuti",
+      "confidence": 96.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:30:20.773912",
+      "session_id": "6adaa441-de8e-4142-8a05-25284bdc5b8b",
+      "user_input": "Berapa jatah cuti tahunan?",
+      "category": "cuti",
+      "confidence": 96.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:39:21.394289",
+      "session_id": "49a526a2-390b-4b22-ad59-8fac2d7f6552",
+      "user_input": "mau resign gimana prosedurnya",
+      "category": "karir",
+      "confidence": 75.55,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:39:24.358165",
+      "session_id": "49a526a2-390b-4b22-ad59-8fac2d7f6552",
+      "user_input": "halo",
+      "category": "greeting",
+      "confidence": 100.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-20T14:39:26.438195",
+      "session_id": "49a526a2-390b-4b22-ad59-8fac2d7f6552",
+      "user_input": "ada shuttle bus ga",
+      "category": "fasilitas",
+      "confidence": 73.4,
+      "is_fallback": false
     }
   ],
   "feedback": [
@@ -98,6 +186,30 @@
       "start_time": "2026-01-20T14:01:41.500484",
       "query_count": 3,
       "last_activity": "2026-01-20T14:02:29.544483",
+      "rated": false
+    },
+    "69d2351a-50c0-4ab1-9d44-1cad6092006a": {
+      "start_time": "2026-01-20T14:16:48.849558",
+      "query_count": 5,
+      "last_activity": "2026-01-20T14:16:59.585570",
+      "rated": false
+    },
+    "59d19d84-dfc8-4c5e-9365-439ffe777d62": {
+      "start_time": "2026-01-20T14:17:47.206514",
+      "query_count": 2,
+      "last_activity": "2026-01-20T14:24:08.173606",
+      "rated": false
+    },
+    "6adaa441-de8e-4142-8a05-25284bdc5b8b": {
+      "start_time": "2026-01-20T14:30:20.773937",
+      "query_count": 1,
+      "last_activity": "2026-01-20T14:30:20.773946",
+      "rated": false
+    },
+    "49a526a2-390b-4b22-ad59-8fac2d7f6552": {
+      "start_time": "2026-01-20T14:39:21.394311",
+      "query_count": 3,
+      "last_activity": "2026-01-20T14:39:26.438270",
       "rated": false
     }
   }
