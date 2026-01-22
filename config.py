@@ -16,7 +16,7 @@ class Config:
     # ==================================================
     # Threshold minimum untuk menganggap pertanyaan cocok (0-100)
     # Semakin tinggi = semakin ketat matching
-    FUZZY_THRESHOLD = 65
+    FUZZY_THRESHOLD = 74
     
     # Bobot untuk masing-masing algoritma fuzzy matching
     # Total harus = 1.0
@@ -66,10 +66,10 @@ class Config:
     
     # Pertanyaan cepat yang muncul di bottom chat
     QUICK_QUESTIONS = [
-        "cuti tahunan berapa?",
-        "gimana cara ngajuin cuti ya",
-        "gaji turun tanggal brp",
-        "ada shuttle bus ga",
+        "Berapa jatah cuti tahunan?",
+        "Tanggal berapa gaji turun?",
+        "Siapa kontak darurat HR?",
+        "Apa itu KPI?",
         "halo",
     ]
     

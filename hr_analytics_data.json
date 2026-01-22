@@ -1,5 +1,101 @@
 {
-  "queries": [],
+  "queries": [
+    {
+      "timestamp": "2026-01-22T20:18:18.568211",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa yang tidak kamu tahu",
+      "category": "greeting",
+      "confidence": 70.1,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:18:27.168911",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "kapan libur",
+      "category": "lembur",
+      "confidence": 70.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:18:43.971217",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "bukan lembur tapi libur",
+      "category": "lembur",
+      "confidence": 67.7,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:24:22.166707",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa saja yang bisa kamu bantu?",
+      "category": "greeting",
+      "confidence": 74.4,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:26:01.408227",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "halo",
+      "category": "greeting",
+      "confidence": 100.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:26:15.725502",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa saja administrasi",
+      "category": null,
+      "confidence": 54.5,
+      "is_fallback": true
+    },
+    {
+      "timestamp": "2026-01-22T20:26:32.506157",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa yg bisa di klaim?",
+      "category": "greeting",
+      "confidence": 65.55,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:31:49.535639",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa lembur",
+      "category": "lembur",
+      "confidence": 82.25,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:32:02.396302",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "berapa gaji lembur",
+      "category": "lembur",
+      "confidence": 66.95,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:32:25.129997",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa yg di akomodasi perusahaan",
+      "category": "benefit",
+      "confidence": 70.0,
+      "is_fallback": false
+    },
+    {
+      "timestamp": "2026-01-22T20:33:53.088598",
+      "session_id": "c8735e93-f421-495d-9a4b-1dec25ee6ee8",
+      "user_input": "apa itu kpi",
+      "category": "karir",
+      "confidence": 85.9,
+      "is_fallback": false
+    }
+  ],
   "feedback": [],
-  "sessions": {}
+  "sessions": {
+    "c8735e93-f421-495d-9a4b-1dec25ee6ee8": {
+      "start_time": "2026-01-22T20:18:18.570414",
+      "query_count": 11,
+      "last_activity": "2026-01-22T20:33:53.088626",
+      "rated": false
+    }
+  }
 }

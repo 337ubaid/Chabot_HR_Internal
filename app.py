@@ -706,7 +706,7 @@ elif page == "ℹ️ Tentang":
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style="text-align: center; color: #666; font-size: 0.8rem;">
-    HR Chatbot v1.0<br>
+    HR Chatbot v1.3<br>
     © 2026 Internal Use Only
 </div>
 """, unsafe_allow_html=True)
